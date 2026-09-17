@@ -205,6 +205,7 @@
   .pos{font-family:var(--display);font-weight:800;font-style:italic;font-size:16px;letter-spacing:.02em;line-height:1;color:var(--pc);display:flex;align-items:center;gap:7px}
   .pos::before{content:"";width:3px;height:20px;background:var(--pc);flex:none}
   .who{min-width:0}
+  .who .sub{display:flex;align-items:center;gap:8px;margin-top:2px;white-space:nowrap;overflow:hidden}
   .name{font-family:var(--display);font-weight:600;font-size:18px;line-height:1;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .name b{font-weight:800;font-style:italic;text-transform:uppercase}
   .meta{display:flex;align-items:center;gap:8px;margin-top:2px;font-family:var(--mono);font-size:10px;color:var(--ash);letter-spacing:.04em;white-space:nowrap;overflow:hidden}
@@ -212,6 +213,7 @@
   .scr:empty{display:none}
   .dd{font-family:var(--mono);font-size:10px;color:var(--te);letter-spacing:.04em;white-space:nowrap}
   .dd:empty{display:none}
+  .dd .ball{color:var(--ash)}
   .sg .rt{display:flex;align-items:center;gap:8px;justify-content:flex-end}
   .tm{display:inline-flex;align-items:center;gap:6px;color:var(--chalk-2)}
   .tm i{width:7px;height:7px;background:var(--tc);flex:none}
@@ -315,8 +317,8 @@
   /* ---- Responsive ---- */
   @media (min-width:1101px){
     .lineup-h,.row{grid-template-columns:44px 1fr 1fr 150px 30px}
-    .row .who{display:flex;align-items:baseline;gap:12px}
-    .row .name{flex:none;max-width:58%}
+    .row .wtop{display:flex;align-items:baseline;gap:12px;min-width:0}
+    .row .name{flex:none;max-width:60%}
     .row .meta{margin-top:0;flex:1;min-width:0}
     .row .score{display:flex;align-items:baseline;justify-content:flex-end;gap:10px}
     .row .proj{order:-1;margin:0}
@@ -907,8 +909,9 @@ function buildRow(p){
   const el=document.createElement('div');el.className='row';el.dataset.id=p.id;el.style.setProperty('--pc',POS_COLOR[p.pos]);
   const st=gameStatus(gameOf(p.team)),sl=statLine(p);
   el.innerHTML=`<div class="pos">${p.pos}</div>
-    <div class="who"><div class="name">${nameHtml(p)}</div>
-      <div class="meta"><span class="tm" style="--tc:${teamColor(p.team)}"><i></i>${esc(p.team)}</span>${oppHtml(p)}${injHtml(p)}<span class="gs ${st.c}" data-gs="${esc(p.team)}">${st.t}</span><span class="dd"></span></div></div>
+    <div class="who"><div class="wtop"><div class="name">${nameHtml(p)}</div>
+      <div class="meta"><span class="tm" style="--tc:${teamColor(p.team)}"><i></i>${esc(p.team)}</span>${oppHtml(p)}${injHtml(p)}</div></div>
+      <div class="sub"><span class="gs ${st.c}" data-gs="${esc(p.team)}">${st.t}</span><span class="dd"></span></div></div>
     <div class="line ${sl.q?'quiet':''}">${esc(sl.t)}</div>
     <div class="score"><span class="pts">${fmt(p.pts)}</span><span class="proj">PROJ ${p.proj.toFixed(1)}</span></div>
     <button class="rm" aria-label="Remove ${esc(p.name)}" title="Remove">×</button><span class="sweep"></span>`;
@@ -1057,7 +1060,8 @@ function fieldState(p){
 function refreshField(){
   for(const [id,el] of rows){const p=PLAYERS[id];if(!p)continue;const st=fieldState(p);
     el.classList.toggle('onfield',!!st);el.classList.toggle('redzone',st==='redzone');
-    const d=el.querySelector('.dd');const h=st?driveHtml(gameOf(p.team)):'';if(d&&d.innerHTML!==h)d.innerHTML=h;}
+    const g=gameOf(p.team);let h=driveHtml(g);if(h&&!st&&g.poss)h=`<span class="ball">${esc(g.poss)} ball · </span>`+h;
+    const d=el.querySelector('.dd');if(d&&d.innerHTML!==h)d.innerHTML=h;}
 }
 function refreshStatuses(){
   const cache={};
