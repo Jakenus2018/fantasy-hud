@@ -621,12 +621,12 @@ function statLine(p){
   if(g.status==='pre')return {t:'',q:true};
   if(g.status==='canceled')return {t:'Game canceled',q:true};
   const parts=[];
-  const td=n=>n?` · ${n} TD`:'';
-  if(p.pos==='QB'){parts.push(`${s.pyd} PASS YDS${td(s.ptd)}${s.int?' · '+s.int+' INT':''}`);if(s.ra)parts.push(`${s.ryd} RUSH YDS${td(s.rtd)}`);}
-  else if(p.pos==='RB'){parts.push(`${s.ra} CAR · ${s.ryd} YDS${td(s.rtd)}`);if(s.rec)parts.push(`${s.rec} REC · ${s.reyd} YDS${td(s.retd)}`);}
-  else if(p.pos==='WR'||p.pos==='TE'){parts.push(`${s.rec} REC · ${s.reyd} YDS${td(s.retd)}`);if(s.ra)parts.push(`${s.ra} CAR · ${s.ryd} YDS${td(s.rtd)}`);}
-  else if(p.pos==='K'){const fg=s.fg0+s.fg40+s.fg50;parts.push(`${fg}/${fg+s.fgm} FG · ${s.xp}/${s.xp+s.xpm} XP`);}
-  else{const pa=ptsAllowed(p,s);parts.push(`${s.sack} SCK · ${s.dint} INT · ${s.fr} FR${td(s.dtd)} · ${pa==null?0:pa} PA`);}
+  const td=n=>n?`, ${n} TD`:'';
+  if(p.pos==='QB'){parts.push(`${s.pyd} YDS${td(s.ptd+s.rtd)}${s.int?', '+s.int+' INT':''}`);}
+  else if(p.pos==='RB'){parts.push(`${s.ra} CAR, ${s.ryd} YDS${td(s.rtd)}`);if(s.rec)parts.push(`${s.rec} REC, ${s.reyd} YDS${td(s.retd)}`);}
+  else if(p.pos==='WR'||p.pos==='TE'){parts.push(`${s.rec} REC, ${s.reyd} YDS${td(s.retd)}`);if(s.ra)parts.push(`${s.ra} CAR, ${s.ryd} YDS${td(s.rtd)}`);}
+  else if(p.pos==='K'){const fg=s.fg0+s.fg40+s.fg50;parts.push(`${fg}/${fg+s.fgm} FG, ${s.xp}/${s.xp+s.xpm} XP`);}
+  else{const pa=ptsAllowed(p,s);parts.push(`${s.sack} SCK, ${s.dint} INT, ${s.fr} FR${td(s.dtd)}, ${pa==null?0:pa} PA`);}
   if(s.fum)parts.push(`${s.fum} FUM`);
   const quiet=(p.pos!=='DST'&&p.pos!=='K'&&!s.pa&&!s.ra&&!s.rec);
   return {t:quiet?'No touches yet':parts.join(' | '),q:quiet};
