@@ -505,10 +505,10 @@
    Then enable Authentication → Google and/or Email/Password, create a Firestore
    database, and add the rules from README.md. Leave apiKey empty to run local-only. */
 const FIREBASE_CONFIG={
-  apiKey:'',
-  authDomain:'',
-  projectId:'',
-  appId:''
+  apiKey:'AIzaSyCa2M-rHpWNhayexVu_Pmk5JHtMsZjPcZs',
+  authDomain:'fantasy-hud.firebaseapp.com',
+  projectId:'fantasy-hud',
+  appId:'1:335052094695:web:4623c84c51940a7dbb7642'
 };
 
 (function(){
@@ -1182,9 +1182,10 @@ const AUTH_ERRORS={
   'auth/popup-blocked':'Your browser blocked the sign-in window — allow pop-ups for this site.',
   'auth/unauthorized-domain':'This site isn’t on the Firebase “Authorized domains” list yet (Authentication → Settings).',
   'auth/operation-not-allowed':'That sign-in method isn’t enabled in Firebase yet (Authentication → Sign-in method).',
-  'auth/network-request-failed':'No connection — check your network and try again.'
+  'auth/network-request-failed':'No connection — check your network and try again.',
+  'auth/configuration-not-found':'Authentication isn’t set up in Firebase yet — open Authentication → Get started and enable a sign-in method.'
 };
-const authMsg=e=>{const c=e&&e.code||'';if(AUTH_ERRORS[c])return AUTH_ERRORS[c];if(/api-key|invalid-api-key|app-not-authorized|configuration-not-found/.test(c))return 'The Firebase config in index.html isn’t valid for this project — re-copy it from the Firebase console.';if(c)return `Sign-in failed (${c.replace(/\.$/,'')}).`;return (e&&e.message)||'Something went wrong.';};
+const authMsg=e=>{const c=e&&e.code||'';if(AUTH_ERRORS[c])return AUTH_ERRORS[c];if(/api-key|invalid-api-key|app-not-authorized/.test(c))return 'The Firebase config in index.html isn’t valid for this project — re-copy it from the Firebase console.';if(c)return `Sign-in failed (${c.replace(/\.$/,'')}).`;return (e&&e.message)||'Something went wrong.';};
 const ACCOUNT={
   ready:false,user:null,db:null,unsub:null,writeTimer:null,lastToken:null,status:'off',statusMsg:'',savedAt:0,mode:'signin',
   configured(){return !!(FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.projectId&&FIREBASE_CONFIG.appId);},
