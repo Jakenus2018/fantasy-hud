@@ -59,7 +59,7 @@
   .wi.td{border-color:var(--flag);background:var(--flag-dim);color:var(--chalk)}
   .wi.to b{color:var(--wr)}
   .wi em{font-style:normal;color:var(--good)}
-  .wi em.neg{color:var(--neg)}
+  .wi em.neg{color:var(--flag)}
   @keyframes wireIn{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
   .topright{display:flex;align-items:center;gap:12px;white-space:nowrap}
   .clock{font-family:var(--mono);font-size:13px;color:var(--chalk-2);letter-spacing:.08em;font-variant-numeric:tabular-nums}
@@ -176,7 +176,8 @@
   .board.blank .num{color:var(--ash-2)}
   .total .eyebrow{display:block;margin-bottom:-6px}
   .total .num{font-family:var(--display);font-weight:800;font-style:italic;font-size:clamp(72px,9.5vw,128px);line-height:.92;letter-spacing:-.02em;font-variant-numeric:tabular-nums;display:inline-block;transition:color .35s,text-shadow .35s}
-  .total .num.hot{color:var(--flag);text-shadow:0 0 30px rgba(255,122,42,.55)}
+  .total .num.hot{color:var(--good);text-shadow:0 0 30px rgba(94,224,161,.5)}
+  .total .num.cold{color:var(--flag);text-shadow:0 0 30px rgba(255,122,42,.55)}
   .total .num small{font-size:.42em;font-weight:700;color:var(--ash);margin-left:6px;font-style:normal}
   .tiles{display:flex;gap:0;align-self:end;flex-wrap:wrap}
   .tile{padding:0 18px;border-left:1px solid var(--line)}
@@ -214,28 +215,29 @@
   .line.quiet{color:var(--ash-2)}
   .score{text-align:right;position:relative}
   .pts{font-family:var(--display);font-weight:800;font-style:italic;font-size:40px;line-height:1;font-variant-numeric:tabular-nums;display:inline-block;letter-spacing:-.01em;transition:color .4s}
-  .pts.hot{color:var(--flag);animation:ptsPunch .55s cubic-bezier(.2,.9,.2,1)}
-  .pts.cold{color:var(--neg);animation:ptsPunch .55s cubic-bezier(.2,.9,.2,1)}
+  .pts.hot{color:var(--good);animation:ptsPunch .55s cubic-bezier(.2,.9,.2,1)}
+  .pts.cold{color:var(--flag);animation:ptsPunch .55s cubic-bezier(.2,.9,.2,1)}
   @keyframes ptsPunch{0%{transform:scale(1)}30%{transform:scale(1.18) translateY(-2px)}100%{transform:scale(1)}}
   .proj{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ash-2);margin-top:2px}
-  .delta{position:absolute;right:calc(100% + 12px);top:50%;margin-top:-13px;font-family:var(--display);font-weight:800;font-style:italic;font-size:22px;line-height:1;color:var(--flag);pointer-events:none;white-space:nowrap;animation:deltaFloat 1.5s cubic-bezier(.2,.8,.2,1) forwards;text-shadow:0 0 14px rgba(255,122,42,.6)}
-  .delta.neg{color:var(--neg);text-shadow:0 0 14px rgba(255,92,92,.6)}
+  .delta{position:absolute;right:calc(100% + 12px);top:50%;margin-top:-13px;font-family:var(--display);font-weight:800;font-style:italic;font-size:22px;line-height:1;color:var(--good);pointer-events:none;white-space:nowrap;animation:deltaFloat 1.5s cubic-bezier(.2,.8,.2,1) forwards;text-shadow:0 0 14px rgba(94,224,161,.6)}
+  .delta.neg{color:var(--flag);text-shadow:0 0 14px rgba(255,122,42,.6)}
   @keyframes deltaFloat{0%{opacity:0;transform:translate(12px,8px) scale(.6)}18%{opacity:1;transform:translate(0,0) scale(1.15)}70%{opacity:1;transform:translate(0,-6px) scale(1)}100%{opacity:0;transform:translate(0,-14px)}}
   .rm{width:30px;height:30px;display:grid;place-items:center;color:var(--ash-2);border:1px solid transparent;transition:.2s;font-size:18px;line-height:1;justify-self:end}
   .row:hover .rm{color:var(--ash)}
   .rm:hover{color:var(--neg);border-color:var(--neg)}
-  .sweep{position:absolute;top:0;bottom:0;left:0;width:36%;background:linear-gradient(90deg,transparent,rgba(255,180,120,.28),transparent);transform:translateX(-140%) skewX(-18deg);pointer-events:none;opacity:0}
-  .row.pop{animation:rowIn 0s, rowPop .9s cubic-bezier(.2,.8,.2,1)}
+  .sweep{position:absolute;top:0;bottom:0;left:0;width:36%;background:linear-gradient(90deg,transparent,var(--sweep-c,rgba(94,224,161,.28)),transparent);transform:translateX(-140%) skewX(-18deg);pointer-events:none;opacity:0}
+  .row.pop{--sweep-c:rgba(94,224,161,.28);animation:rowIn 0s, rowPop .9s cubic-bezier(.2,.8,.2,1)}
   .row.pop .sweep{animation:sweep .8s ease-out}
-  @keyframes rowPop{0%{box-shadow:inset 0 0 0 0 rgba(255,122,42,0)}15%{background:rgba(255,122,42,.16);box-shadow:inset 3px 0 0 0 var(--flag)}100%{background:transparent;box-shadow:inset 0 0 0 0 rgba(255,122,42,0)}}
+  @keyframes rowPop{0%{box-shadow:inset 0 0 0 0 rgba(94,224,161,0)}15%{background:rgba(94,224,161,.14);box-shadow:inset 3px 0 0 0 var(--good)}100%{background:transparent;box-shadow:inset 0 0 0 0 rgba(94,224,161,0)}}
   @keyframes sweep{0%{transform:translateX(-140%) skewX(-18deg);opacity:1}100%{transform:translateX(320%) skewX(-18deg);opacity:0}}
-  .row.dip{animation:rowIn 0s, rowDip .9s cubic-bezier(.2,.8,.2,1)}
-  @keyframes rowDip{15%{background:rgba(255,92,92,.14);box-shadow:inset 3px 0 0 0 var(--neg)}100%{background:transparent}}
+  .row.dip{--sweep-c:rgba(255,160,90,.28);animation:rowIn 0s, rowDip .9s cubic-bezier(.2,.8,.2,1)}
+  .row.dip .sweep{animation:sweep .8s ease-out}
+  @keyframes rowDip{15%{background:rgba(255,122,42,.14);box-shadow:inset 3px 0 0 0 var(--flag)}100%{background:transparent}}
   .row.out{animation:rowOut .3s ease-in both}
   @keyframes rowOut{to{opacity:0;transform:translateX(30px)}}
-  .stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg) scale(.6);font-family:var(--display);font-weight:900;font-style:italic;font-size:44px;letter-spacing:.06em;color:var(--flag);border:3px solid var(--flag);padding:0 10px;line-height:1.1;pointer-events:none;mix-blend-mode:screen;animation:stamp 1.3s cubic-bezier(.2,.9,.2,1) forwards;text-transform:uppercase}
+  .stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg) scale(.6);font-family:var(--display);font-weight:900;font-style:italic;font-size:44px;letter-spacing:.06em;color:var(--good);border:3px solid var(--good);padding:0 10px;line-height:1.1;pointer-events:none;mix-blend-mode:screen;animation:stamp 1.3s cubic-bezier(.2,.9,.2,1) forwards;text-transform:uppercase}
   @keyframes stamp{0%{opacity:0;transform:translate(-50%,-50%) rotate(-8deg) scale(1.6)}20%{opacity:1;transform:translate(-50%,-50%) rotate(-8deg) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-52%) rotate(-8deg) scale(1.05)}}
-  .spark{position:absolute;right:60px;top:50%;width:6px;height:6px;background:var(--sc,var(--flag));pointer-events:none;animation:spark .9s cubic-bezier(.1,.8,.3,1) forwards}
+  .spark{position:absolute;right:60px;top:50%;width:6px;height:6px;background:var(--sc,var(--good));pointer-events:none;animation:spark .9s cubic-bezier(.1,.8,.3,1) forwards}
   @keyframes spark{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
 
   .empty{border:1px dashed var(--line);padding:38px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -916,10 +918,10 @@ function refreshTotals(animate){
 }
 function tweenTotal(){
   const from=shownTotal,to=total;if(from===to)return;
-  const el=$('#total');el.classList.add('hot');
+  const el=$('#total');el.classList.remove('hot','cold');el.classList.add(to>=from?'hot':'cold');
   const t0=performance.now(),dur=700;
   if(totalTween)cancelAnimationFrame(totalTween);
-  const step=t=>{const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);shownTotal=from+(to-from)*e;el.innerHTML=fmt(shownTotal)+'<small>PTS</small>';if(k<1)totalTween=requestAnimationFrame(step);else{shownTotal=to;el.innerHTML=fmt(to)+'<small>PTS</small>';setTimeout(()=>el.classList.remove('hot'),350);}};
+  const step=t=>{const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);shownTotal=from+(to-from)*e;el.innerHTML=fmt(shownTotal)+'<small>PTS</small>';if(k<1)totalTween=requestAnimationFrame(step);else{shownTotal=to;el.innerHTML=fmt(to)+'<small>PTS</small>';setTimeout(()=>el.classList.remove('hot','cold'),350);}};
   totalTween=requestAnimationFrame(step);
 }
 
@@ -973,7 +975,7 @@ function animateScore(p,oldPts,newPts,isTD){
   if(isTD){
     const stamp=document.createElement('span');stamp.className='stamp';stamp.textContent='Touchdown';el.appendChild(stamp);setTimeout(()=>stamp.remove(),1300);
     const col=teamColor(p.team);
-    for(let i=0;i<16;i++){const s=document.createElement('i');s.className='spark';const a=Math.random()*Math.PI*2,r=40+Math.random()*90;s.style.setProperty('--dx',Math.cos(a)*r+'px');s.style.setProperty('--dy',Math.sin(a)*r+'px');s.style.setProperty('--sc',i%3?col:'var(--flag)');s.style.animationDelay=(Math.random()*80)+'ms';el.appendChild(s);setTimeout(()=>s.remove(),1000);}
+    for(let i=0;i<16;i++){const s=document.createElement('i');s.className='spark';const a=Math.random()*Math.PI*2,r=40+Math.random()*90;s.style.setProperty('--dx',Math.cos(a)*r+'px');s.style.setProperty('--dy',Math.sin(a)*r+'px');s.style.setProperty('--sc',i%3?col:'var(--good)');s.style.animationDelay=(Math.random()*80)+'ms';el.appendChild(s);setTimeout(()=>s.remove(),1000);}
   }
 }
 function processDirty(){
@@ -1358,7 +1360,7 @@ async function boot(){
   MODE='sim';loadTeams();SIM.init();finishBoot();
 }
 // Console handle for poking at the data layer, e.g. GH.sleeper.poll()
-window.GH={get mode(){return MODE},get players(){return PLAYERS},get games(){return GAMES},get teams(){return STORE},get team(){return team},get feed(){return FEED},sleeper:SLEEPER,sim:SIM,account:ACCOUNT};
+window.GH={get mode(){return MODE},get players(){return PLAYERS},get games(){return GAMES},get teams(){return STORE},get team(){return team},get feed(){return FEED},sleeper:SLEEPER,sim:SIM,account:ACCOUNT,refresh:processDirty};
 boot();
 })();
 </script>
