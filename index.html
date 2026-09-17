@@ -210,6 +210,9 @@
   .meta{display:flex;align-items:center;gap:8px;margin-top:2px;font-family:var(--mono);font-size:10px;color:var(--ash);letter-spacing:.04em;white-space:nowrap;overflow:hidden}
   .scr{color:var(--chalk);font-weight:500;font-variant-numeric:tabular-nums}
   .scr:empty{display:none}
+  .dd{font-family:var(--mono);font-size:10px;color:var(--te);letter-spacing:.04em;white-space:nowrap}
+  .dd:empty{display:none}
+  .sg .rt{display:flex;align-items:center;gap:8px;justify-content:flex-end}
   .tm{display:inline-flex;align-items:center;gap:6px;color:var(--chalk-2)}
   .tm i{width:7px;height:7px;background:var(--tc);flex:none}
   .inj{font-size:9px;letter-spacing:.1em;padding:1px 4px;border:1px solid currentColor;color:var(--te);line-height:1.3}
@@ -218,7 +221,7 @@
   .row.redzone{background:rgba(255,59,59,.11);box-shadow:inset 3px 0 0 var(--live)}
   .row.redzone:hover{background:rgba(255,59,59,.14)}
   .inj.out{color:var(--neg)}
-  .line{font-family:var(--mono);font-size:11.5px;color:var(--chalk-2);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .line{font-family:var(--mono);font-size:11px;color:var(--chalk-2);letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .line:empty{display:none}
   .line.quiet{color:var(--ash-2)}
   .score{text-align:right;position:relative}
@@ -339,7 +342,7 @@
     .top{grid-template-columns:auto auto;padding:10px 16px}
     .wire{grid-column:1 / -1;grid-row:2;margin-top:8px}
     .topright{justify-self:end}
-    .clock,.fresh,.acct .nm{display:none}
+    .clock,.fresh,.acct .nm,.dd .yl{display:none}
     .acct{padding:0 6px}
     .banner{padding:8px 16px}
     .board{grid-template-columns:1fr;grid-template-areas:"total" "cta" "tiles"}
@@ -620,19 +623,21 @@ function statLine(p){
   if(g.status==='pre')return {t:'',q:true};
   if(g.status==='canceled')return {t:'Game canceled',q:true};
   const parts=[];
-  if(p.pos==='QB'){parts.push(`${s.pc}/${s.pa} · ${s.pyd} YDS · ${s.ptd} TD`);if(s.int)parts.push(`${s.int} INT`);if(s.ra)parts.push(`${s.ra}-${s.ryd} RUSH${s.rtd?' · '+s.rtd+' TD':''}`);}
-  else if(p.pos==='RB'){parts.push(`${s.ra} CAR · ${s.ryd} YDS${s.rtd?' · '+s.rtd+' TD':''}`);if(s.rec)parts.push(`${s.rec} REC · ${s.reyd} YDS${s.retd?' · '+s.retd+' TD':''}`);}
-  else if(p.pos==='WR'||p.pos==='TE'){parts.push(`${s.rec} REC · ${s.reyd} YDS${s.retd?' · '+s.retd+' TD':''}`);if(s.ra)parts.push(`${s.ra}-${s.ryd} RUSH${s.rtd?' · '+s.rtd+' TD':''}`);}
+  const td=n=>n?` · ${n} TD`:'';
+  if(p.pos==='QB'){parts.push(`${s.pyd} PASS YDS${td(s.ptd)}${s.int?' · '+s.int+' INT':''}`);if(s.ra)parts.push(`${s.ryd} RUSH YDS${td(s.rtd)}`);}
+  else if(p.pos==='RB'){parts.push(`${s.ra} CAR · ${s.ryd} YDS${td(s.rtd)}`);if(s.rec)parts.push(`${s.rec} REC · ${s.reyd} YDS${td(s.retd)}`);}
+  else if(p.pos==='WR'||p.pos==='TE'){parts.push(`${s.rec} REC · ${s.reyd} YDS${td(s.retd)}`);if(s.ra)parts.push(`${s.ra} CAR · ${s.ryd} YDS${td(s.rtd)}`);}
   else if(p.pos==='K'){const fg=s.fg0+s.fg40+s.fg50;parts.push(`${fg}/${fg+s.fgm} FG · ${s.xp}/${s.xp+s.xpm} XP`);}
-  else{const pa=ptsAllowed(p,s);parts.push(`${s.sack} SCK · ${s.dint} INT · ${s.fr} FR${s.dtd?' · '+s.dtd+' TD':''} · ${pa==null?0:pa} PA`);}
+  else{const pa=ptsAllowed(p,s);parts.push(`${s.sack} SCK · ${s.dint} INT · ${s.fr} FR${td(s.dtd)} · ${pa==null?0:pa} PA`);}
   if(s.fum)parts.push(`${s.fum} FUM`);
   const quiet=(p.pos!=='DST'&&p.pos!=='K'&&!s.pa&&!s.ra&&!s.rec);
-  return {t:quiet?'No touches yet':parts.join('  |  '),q:quiet};
+  return {t:quiet?'No touches yet':parts.join(' | '),q:quiet};
 }
 function fmtKick(ms){
   if(!ms)return 'TBD';
   const d=new Date(ms);return d.toLocaleDateString([],{weekday:'short'})+' '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
 }
+function driveHtml(g){if(!g||g.status!=='live'||!g.dd)return '';return esc(g.dd)+(g.yl?`<span class="yl"> · ${esc(g.ylt)} ${esc(g.yl)}</span>`:'');}
 function gameStatus(g){
   if(!g)return {t:'BYE',c:'final'};
   if(g.status==='pre')return {t:fmtKick(g.kick),c:'pre'};
@@ -685,7 +690,7 @@ const SLEEPER={
     let liveText='LIVE';
     if(/half/i.test(q)||q==='H')liveText='HALFTIME';else if(/OT/i.test(q))liveText='OT '+tr;else if(qn)liveText=`Q${qn} ${tr}`;
     return {id:String(e.game_id),home:m.home_team,away:m.away_team,kick,hs:+m.home_score||0,as:+m.away_score||0,
-      status:canceled?'canceled':over?'final':started?'live':'pre',liveText,finalText:(m.is_overtime||/OT/i.test(q))?'FINAL/OT':'FINAL',poss:String(m.possession||'').toUpperCase(),rz:!!m.red_zone};
+      status:canceled?'canceled':over?'final':started?'live':'pre',liveText,finalText:(m.is_overtime||/OT/i.test(q))?'FINAL/OT':'FINAL',poss:String(m.possession||'').toUpperCase(),rz:!!m.red_zone,dd:String(m.down_and_distance||''),yl:String(m.yard_line||''),ylt:String(m.yard_line_territory||'').toUpperCase()};
   },
   applyGames(arr){
     let changed=false;const byId=new Map(GAMES.map(g=>[g.id,g]));
@@ -840,11 +845,12 @@ WAS|QB Jayden Daniels**~|RB Jacory Croskey-Merritt|RB Austin Ekeler|WR Terry McL
     if(Math.random()<.06){if(Math.random()<.48){this.score(g,team,2);T.qb.st.tp++;dirty.add(T.qb);return ' (2-pt good)';}return ' (2-pt failed)';}
     const k=T.k;dirty.add(k);if(Math.random()<.96){k.st.xp++;this.score(g,team,1);return '';}k.st.xpm++;return ' (XP missed)';
   },
-  endDrive(g){g.poss=g.poss===g.home?g.away:g.home;g.drivePlays=0;g.driveLen=rnd(4,10);g.rz=false;},
+  endDrive(g){g.poss=g.poss===g.home?g.away:g.home;g.drivePlays=0;g.driveLen=rnd(4,10);g.rz=false;g.dd='';},
   runPlay(g,silent){
     const offT=g.poss,defT=offT===g.home?g.away:g.home,O=this.TEAMS[offT],D=this.TEAMS[defT],qb=O.qb,dst=D.dst;
     const say=(type,text)=>{if(!silent)feed(type,text);};
     g.drivePlays++;dirty.add(qb);let ended=false;g.rz=g.drivePlays>=g.driveLen-2;
+    g.dd=['1st & 10','2nd & 7','3rd & 3','2nd & 4','1st & 10','3rd & 8','2nd & 12'][g.drivePlays%7];g.yl=String(g.rz?rnd(2,19):rnd(20,49));g.ylt=g.rz?defT:(Math.random()<.5?offT:defT);
     if(Math.random()<O.passRate){
       const r=Math.random();
       if(r<.065){dst.st.sack++;dirty.add(dst);say('to',`${D.nick} sack ${qb.short}`);}
@@ -902,7 +908,7 @@ function buildRow(p){
   const st=gameStatus(gameOf(p.team)),sl=statLine(p);
   el.innerHTML=`<div class="pos">${p.pos}</div>
     <div class="who"><div class="name">${nameHtml(p)}</div>
-      <div class="meta"><span class="tm" style="--tc:${teamColor(p.team)}"><i></i>${esc(p.team)}</span>${oppHtml(p)}${injHtml(p)}<span class="gs ${st.c}" data-gs="${esc(p.team)}">${st.t}</span></div></div>
+      <div class="meta"><span class="tm" style="--tc:${teamColor(p.team)}"><i></i>${esc(p.team)}</span>${oppHtml(p)}${injHtml(p)}<span class="gs ${st.c}" data-gs="${esc(p.team)}">${st.t}</span><span class="dd"></span></div></div>
     <div class="line ${sl.q?'quiet':''}">${esc(sl.t)}</div>
     <div class="score"><span class="pts">${fmt(p.pts)}</span><span class="proj">PROJ ${p.proj.toFixed(1)}</span></div>
     <button class="rm" aria-label="Remove ${esc(p.name)}" title="Remove">×</button><span class="sweep"></span>`;
@@ -1028,7 +1034,7 @@ function renderSlate(){
     el.innerHTML=`<div class="teams">
       <span class="t ${g.poss===g.away?'poss':''}" data-t="${esc(g.away)}" style="--tc:${teamColor(g.away)}"><i></i>${esc(g.away)}</span><span class="sc" data-sc="a">${pre?'':g.as}</span><span class="at">@</span>
       <span class="t ${g.poss===g.home?'poss':''}" data-t="${esc(g.home)}" style="--tc:${teamColor(g.home)}"><i></i>${esc(g.home)}</span><span class="sc" data-sc="h">${pre?'':g.hs}</span></div>
-      <span class="gs ${st.c}" data-gs="${esc(g.home)}">${st.t}</span>`;
+      <span class="rt"><span class="dd" data-dd="${esc(g.id)}">${driveHtml(g)}</span><span class="gs ${st.c}" data-gs="${esc(g.home)}">${st.t}</span></span>`;
     slateRows.set(g.id,el);slateEl.appendChild(el);
   });
   const live=GAMES.filter(g=>g.status==='live').length;$('#slateCount').textContent=live?live+' live':'';
@@ -1050,12 +1056,14 @@ function fieldState(p){
 }
 function refreshField(){
   for(const [id,el] of rows){const p=PLAYERS[id];if(!p)continue;const st=fieldState(p);
-    el.classList.toggle('onfield',!!st);el.classList.toggle('redzone',st==='redzone');}
+    el.classList.toggle('onfield',!!st);el.classList.toggle('redzone',st==='redzone');
+    const d=el.querySelector('.dd');const h=st?driveHtml(gameOf(p.team)):'';if(d&&d.innerHTML!==h)d.innerHTML=h;}
 }
 function refreshStatuses(){
   const cache={};
   document.querySelectorAll('[data-gs]').forEach(el=>{const t=el.dataset.gs;const st=cache[t]||(cache[t]=gameStatus(gameOf(t)));if(el.textContent!==st.t)el.textContent=st.t;if(!el.classList.contains(st.c)){el.className='gs '+st.c;}});
   document.querySelectorAll('[data-scr]').forEach(el=>{const v=scoreText(el.dataset.scr);if(el.textContent!==v)el.textContent=v;});
+  for(const g of GAMES){const el=slateRows.get(g.id);if(!el)continue;const d=el.querySelector('.dd');const h=driveHtml(g);if(d&&d.innerHTML!==h)d.innerHTML=h;}
 }
 
 /* ================= RENDER: WIRE + HEADER ================= */
