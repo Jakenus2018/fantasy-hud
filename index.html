@@ -211,15 +211,10 @@
   .tm{display:inline-flex;align-items:center;gap:6px;color:var(--chalk-2)}
   .tm i{width:8px;height:8px;background:var(--tc);flex:none}
   .inj{font-size:9px;letter-spacing:.1em;padding:1px 4px;border:1px solid currentColor;color:var(--te);line-height:1.3}
-  .fld{display:none;font-size:9px;letter-spacing:.14em;padding:1px 6px;border:1px solid currentColor;color:var(--chalk);line-height:1.4;align-items:center;gap:5px;text-transform:uppercase}
-  .fld::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor}
-  .row.onfield .fld{display:inline-flex}
-  .row.onfield{background:rgba(243,240,230,.05);box-shadow:inset 3px 0 0 var(--chalk)}
-  .row.onfield:hover{background:rgba(243,240,230,.07)}
-  .row.redzone{background:rgba(255,59,59,.12);box-shadow:inset 3px 0 0 var(--live)}
-  .row.redzone:hover{background:rgba(255,59,59,.15)}
-  .row.redzone .fld{color:var(--live);animation:blink 1.1s infinite}
-  .row.redzone .name b{color:#ffd9d9}
+  .row.onfield{background:rgba(255,214,80,.07);box-shadow:inset 3px 0 0 rgba(255,214,80,.75)}
+  .row.onfield:hover{background:rgba(255,214,80,.1)}
+  .row.redzone{background:rgba(255,59,59,.11);box-shadow:inset 3px 0 0 var(--live)}
+  .row.redzone:hover{background:rgba(255,59,59,.14)}
   .inj.out{color:var(--neg)}
   .line{font-family:var(--mono);font-size:12.5px;color:var(--chalk-2);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .line.quiet{color:var(--ash-2)}
@@ -897,7 +892,7 @@ function buildRow(p){
   const st=gameStatus(gameOf(p.team)),sl=statLine(p);
   el.innerHTML=`<div class="pos">${p.pos}</div>
     <div class="who"><div class="name">${nameHtml(p)}</div>
-      <div class="meta"><span class="tm" style="--tc:${teamColor(p.team)}"><i></i>${esc(p.team)}</span>${oppHtml(p)}${injHtml(p)}<span class="fld"></span><span class="gs ${st.c}" data-gs="${esc(p.team)}">${st.t}</span></div></div>
+      <div class="meta"><span class="tm" style="--tc:${teamColor(p.team)}"><i></i>${esc(p.team)}</span>${oppHtml(p)}${injHtml(p)}<span class="gs ${st.c}" data-gs="${esc(p.team)}">${st.t}</span></div></div>
     <div class="line ${sl.q?'quiet':''}">${esc(sl.t)}</div>
     <div class="score"><span class="pts">${fmt(p.pts)}</span><span class="proj">PROJ ${p.proj.toFixed(1)}</span></div>
     <button class="rm" aria-label="Remove ${esc(p.name)}" title="Remove">×</button><span class="sweep"></span>`;
@@ -1045,8 +1040,7 @@ function fieldState(p){
 }
 function refreshField(){
   for(const [id,el] of rows){const p=PLAYERS[id];if(!p)continue;const st=fieldState(p);
-    el.classList.toggle('onfield',!!st);el.classList.toggle('redzone',st==='redzone');
-    const tag=el.querySelector('.fld');const txt=st==='redzone'?'Red zone':st==='onfield'?(p.pos==='DST'?'On field':'Has ball'):'';if(tag&&tag.textContent!==txt)tag.textContent=txt;}
+    el.classList.toggle('onfield',!!st);el.classList.toggle('redzone',st==='redzone');}
 }
 function refreshStatuses(){
   const cache={};
