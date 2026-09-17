@@ -75,6 +75,39 @@
   .icon-btn{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);color:var(--chalk-2);transition:border-color .2s,color .2s,transform .3s}
   .icon-btn:hover{border-color:var(--chalk);color:var(--chalk);transform:rotate(25deg)}
   .icon-btn svg{width:18px;height:18px}
+  .acct{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 12px 0 6px;border:1px solid var(--line);color:var(--chalk-2);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;transition:.2s;position:relative;max-width:180px}
+  .acct:hover{border-color:var(--chalk);color:var(--chalk)}
+  .acct .av{width:26px;height:26px;border-radius:50%;background:var(--flag);color:#1a0a03;font-family:var(--display);font-weight:800;font-size:15px;display:grid;place-items:center;overflow:hidden;flex:none}
+  .acct .av.off{background:transparent;color:var(--ash);border:1px solid var(--line)}
+  .acct .av img{width:100%;height:100%;object-fit:cover;display:block}
+  .acct .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .acct .sync{position:absolute;right:-4px;top:-4px;width:9px;height:9px;border-radius:50%;background:var(--ash-2);border:2px solid var(--turf)}
+  .acct .sync.saving{background:var(--te);animation:blink .8s infinite}
+  .acct .sync.saved{background:var(--good)}
+  .acct .sync.error{background:var(--neg)}
+  .sheet.narrow{width:min(460px,100%)}
+  .aform{display:flex;flex-direction:column;gap:10px}
+  .aform input{background:rgba(0,0,0,.28);border:1px solid var(--line);padding:11px 12px;font-family:var(--body);font-size:15px;color:var(--chalk)}
+  .aform input:focus{border-color:var(--flag);outline:0}
+  .btn.wide{justify-content:center;width:100%;clip-path:none}
+  .btn.google{background:var(--chalk);color:var(--turf);font-style:normal;text-transform:none;font-family:var(--body);font-weight:600;font-size:15px;letter-spacing:0}
+  .btn.google:hover{background:#fff}
+  .btn.google svg{width:18px;height:18px}
+  .or{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--ash-2);text-transform:uppercase}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+  .alinks{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .alinks button{font-size:13px;color:var(--ash);text-decoration:underline;text-underline-offset:3px}
+  .alinks button:hover{color:var(--chalk)}
+  .amsg{margin:0;font-size:13px;color:var(--neg);min-height:1.2em}
+  .amsg.ok{color:var(--good)}
+  .me{display:flex;align-items:center;gap:14px}
+  .me .av{width:46px;height:46px;border-radius:50%;background:var(--flag);color:#1a0a03;font-family:var(--display);font-weight:800;font-size:24px;display:grid;place-items:center;overflow:hidden;flex:none}
+  .me .av img{width:100%;height:100%;object-fit:cover;display:block}
+  .me b{font-family:var(--display);font-size:22px;font-weight:700;display:block;line-height:1.1}
+  .me span{font-family:var(--mono);font-size:11px;color:var(--ash);word-break:break-all}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--turf-3);border:1px solid var(--line);color:var(--chalk);padding:10px 16px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;opacity:0;transition:.3s;z-index:30;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  .code{font-family:var(--mono);font-size:11px;background:rgba(0,0,0,.3);border:1px solid var(--line);padding:10px 12px;white-space:pre-wrap;color:var(--chalk-2);margin:0;line-height:1.5}
   .banner{display:flex;align-items:center;gap:12px;padding:8px 20px;background:var(--flag-dim);border-bottom:1px solid rgba(255,122,42,.35);font-size:13px;color:var(--chalk-2)}
   .banner b{color:var(--flag);font-weight:600}
   .banner button{margin-left:auto;color:var(--ash);font-size:20px;line-height:1;padding:0 4px}
@@ -284,7 +317,8 @@
     .top{grid-template-columns:auto auto;padding:10px 16px}
     .wire{grid-column:1 / -1;grid-row:2;margin-top:8px}
     .topright{justify-self:end}
-    .clock,.fresh{display:none}
+    .clock,.fresh,.acct .nm{display:none}
+    .acct{padding:0 6px}
     .banner{padding:8px 16px}
     .board{grid-template-columns:1fr;grid-template-areas:"total" "cta" "tiles"}
     .cta{justify-content:flex-start}
@@ -312,7 +346,8 @@
       <span class="fresh" id="fresh"></span>
       <button class="feedtag loading" id="feedTag" title="Data source — click for settings"><i></i>Connecting</button>
       <span class="clock" id="clock">--:--:--</span>
-      <button class="icon-btn" id="openSettings" aria-label="Scoring settings" title="Scoring settings">
+      <button class="acct" id="acctBtn" hidden title="Account"><span class="av off">?</span><span class="nm">Sign in</span><i class="sync" id="syncDot"></i></button>
+      <button class="icon-btn" id="openSettings" aria-label="App settings" title="App settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
       </button>
     </div>
@@ -443,6 +478,10 @@
         <p class="note">Scoring rules belong to each team — use the <b>Scoring</b> button on the board to edit the active team's rules and name.</p>
       </div>
       <div class="grp">
+        <span class="eyebrow">Account</span>
+        <div id="acctSettings"></div>
+      </div>
+      <div class="grp">
         <span class="eyebrow">Data</span>
         <div class="danger"><button class="chip" id="reloadPage">Reload data</button></div>
       </div>
@@ -450,7 +489,28 @@
   </div>
 </div>
 
+<!-- Account: sign in / profile -->
+<div class="modal" id="acctModal" hidden role="dialog" aria-modal="true" aria-label="Account">
+  <div class="sheet narrow">
+    <div class="shead"><h2>Account</h2><kbd class="esc" id="closeAcct">ESC</kbd></div>
+    <div class="sbody" id="acctBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
+/* ================= ACCOUNTS: Firebase config =================
+   Optional. To turn on sign-in and cloud-saved teams, create a Firebase project
+   (console.firebase.google.com), add a Web app, and paste its config here.
+   Then enable Authentication → Google and/or Email/Password, create a Firestore
+   database, and add the rules from README.md. Leave apiKey empty to run local-only. */
+const FIREBASE_CONFIG={
+  apiKey:'',
+  authDomain:'',
+  projectId:'',
+  appId:''
+};
+
 (function(){
 'use strict';
 const $=s=>document.querySelector(s);
@@ -492,13 +552,19 @@ let roster=[];                              // alias of team.roster (never reass
 let scoring=Object.assign({},DEFAULT_SCORING); // active team's rules
 const teamsKey=()=>MODE==='sleeper'?'gh.teams.sleeper':'gh.teams.sim';
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-function loadTeams(){
-  let s=LS.get(teamsKey(),null);
+function normalizeStore(s){
   if(!s||!Array.isArray(s.teams))s={active:null,teams:[]};   // no history → blank board, nothing invented
-  s.teams.forEach(t=>{t.scoring=Object.assign({},DEFAULT_SCORING,t.scoring||{});t.roster=Array.isArray(t.roster)?t.roster:[];t.name=String(t.name||'').slice(0,28);});
-  STORE=s;setActive(s.active);
+  const out={active:s.active||null,teams:[]};
+  for(const t of s.teams){if(!t||typeof t!=='object')continue;out.teams.push({id:String(t.id||uid()),name:String(t.name||'').slice(0,28),roster:Array.isArray(t.roster)?t.roster.map(String):[],scoring:Object.assign({},DEFAULT_SCORING,t.scoring||{})});}
+  return out;
 }
-function saveTeams(){LS.set(teamsKey(),STORE);}
+function loadTeams(){STORE=normalizeStore(LS.get(teamsKey(),null));setActive(STORE.active);}
+function saveTeams(){LS.set(teamsKey(),STORE);ACCOUNT.push(false);}
+// Players on a roster but missing from the current index (bye week, other device) come back from the name cache.
+function restoreKnown(){
+  const known=LS.get('gh.known',{});
+  for(const id of allRosterIds()){const k=known[id];if(!PLAYERS[id]&&k){const p={id,name:k.n,pos:k.p,team:k.t,short:k.p==='DST'?k.n.replace(' D/ST',''):shortName(k.n),inj:'',projSt:null,st:blankStats(),pts:0,proj:0};PLAYERS[id]=p;ALL.push(p);}}
+}
 function setActive(id){
   team=STORE.teams.find(t=>t.id===id)||STORE.teams[0]||null;
   STORE.active=team?team.id:null;roster=team?team.roster:[];scoring=team?team.scoring:Object.assign({},DEFAULT_SCORING);
@@ -622,9 +688,8 @@ const SLEEPER={
       const p={id,name,pos,team:e.team,short:pos==='DST'?pl.last_name:shortName(name),inj:INJ_SHORT[pl.injury_status]||'',projSt:this.mapStats(e.stats),st:blankStats(),pts:0,proj:0};
       p.proj=calcProj(p);PLAYERS[id]=p;ALL.push(p);known[id]={n:name,p:pos,t:e.team};
     }
-    // Rostered players missing from this week's index (bye week, inactive) come back from the cache.
-    for(const id of allRosterIds()){const k=known[id];if(!PLAYERS[id]&&k){const p={id,name:k.n,pos:k.p,team:k.t,short:k.p==='DST'?k.n.replace(' D/ST',''):shortName(k.n),inj:'',projSt:null,st:blankStats(),pts:0,proj:0};PLAYERS[id]=p;ALL.push(p);}}
     LS.set('gh.known',known);
+    restoreKnown();
   },
   applyStats(arr){
     const byId=new Map();for(const e of arr)byId.set(String(e.player_id),e);
@@ -1079,6 +1144,7 @@ const SRC_NOTES={
   sim:'A play-by-play simulation that runs in your browser — handy for testing the board when nothing is on.'
 };
 function renderSettings(){
+  renderAcctSettings();
   $('#speed').value=settings.speed;$('#speedOut').textContent=settings.speed+' s / real s';
   document.querySelectorAll('.src').forEach(b=>b.classList.toggle('on',b.dataset.src===settings.source));
   $('#srcNote').innerHTML=SRC_NOTES[settings.source]+(MODE==='sleeper'?` Currently <b>live</b> — ${SLEEPER.season} week ${SLEEPER.week}.`:' Currently running the <b>simulation</b>.');
@@ -1092,10 +1158,149 @@ feedTag.addEventListener('click',()=>{renderSettings();settingsModal.hidden=fals
 $('#closeSettings').addEventListener('click',()=>settingsModal.hidden=true);
 settingsModal.addEventListener('click',e=>{if(e.target===settingsModal)settingsModal.hidden=true;});
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeSearch();settingsModal.hidden=true;closeTeamModal();}
+  if(e.key==='Escape'){closeSearch();settingsModal.hidden=true;closeTeamModal();acctModal.hidden=true;}
   const typing=/^(INPUT|TEXTAREA)$/.test((document.activeElement||{}).tagName);
   if(!typing&&(e.key==='/'||((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'))){e.preventDefault();openSearch();}
 });
+
+/* ================= ACCOUNTS (Firebase Auth + Firestore) =================
+   Cloud doc users/{uid}: { sleeper:STORE, sim:STORE, known:{id:{n,p,t}}, token, updatedAt }.
+   Every saveTeams() pushes (debounced); a live listener applies edits made on other devices. */
+const acctBtn=$('#acctBtn'),acctModal=$('#acctModal'),acctBody=$('#acctBody');
+let toastTimer=null;
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3200);}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('Failed to load '+src));document.head.appendChild(s);});}
+const AUTH_ERRORS={
+  'auth/invalid-email':'That email address doesn’t look right.',
+  'auth/user-not-found':'Email or password is incorrect.','auth/wrong-password':'Email or password is incorrect.','auth/invalid-credential':'Email or password is incorrect.',
+  'auth/email-already-in-use':'There’s already an account with that email — sign in instead.',
+  'auth/weak-password':'Use a password of at least 6 characters.',
+  'auth/missing-password':'Enter a password.',
+  'auth/too-many-requests':'Too many attempts — wait a minute and try again.',
+  'auth/popup-closed-by-user':'The sign-in window was closed before finishing.',
+  'auth/cancelled-popup-request':'The sign-in window was closed before finishing.',
+  'auth/popup-blocked':'Your browser blocked the sign-in window — allow pop-ups for this site.',
+  'auth/unauthorized-domain':'This site isn’t on the Firebase “Authorized domains” list yet (Authentication → Settings).',
+  'auth/operation-not-allowed':'That sign-in method isn’t enabled in Firebase yet (Authentication → Sign-in method).',
+  'auth/network-request-failed':'No connection — check your network and try again.'
+};
+const authMsg=e=>{const c=e&&e.code||'';if(AUTH_ERRORS[c])return AUTH_ERRORS[c];if(/api-key|invalid-api-key|app-not-authorized|configuration-not-found/.test(c))return 'The Firebase config in index.html isn’t valid for this project — re-copy it from the Firebase console.';if(c)return `Sign-in failed (${c.replace(/\.$/,'')}).`;return (e&&e.message)||'Something went wrong.';};
+const ACCOUNT={
+  ready:false,user:null,db:null,unsub:null,writeTimer:null,lastToken:null,status:'off',statusMsg:'',savedAt:0,mode:'signin',
+  configured(){return !!(FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.projectId&&FIREBASE_CONFIG.appId);},
+  async init(){
+    renderAcctSettings();
+    if(!this.configured())return;
+    acctBtn.hidden=false;this.setStatus('off','Loading account service…');
+    try{
+      const v='10.14.1',base=`https://www.gstatic.com/firebasejs/${v}/`;
+      await loadScript(base+'firebase-app-compat.js');
+      await Promise.all([loadScript(base+'firebase-auth-compat.js'),loadScript(base+'firebase-firestore-compat.js')]);
+      firebase.initializeApp(FIREBASE_CONFIG);this.db=firebase.firestore();this.ready=true;
+      firebase.auth().useDeviceLanguage();
+      firebase.auth().getRedirectResult().catch(e=>{this.setStatus('error',authMsg(e));});
+      firebase.auth().onAuthStateChanged(u=>this.onAuth(u));
+    }catch(e){console.warn('Account service unavailable',e);this.setStatus('error','Account service failed to load');renderAcctBtn();}
+  },
+  setStatus(s,msg){this.status=s;this.statusMsg=msg||'';if(s==='saved')this.savedAt=Date.now();const dot=acctBtn.querySelector('.sync');if(dot)dot.className='sync '+(this.user?s:'');acctBtn.title=this.user?(msg||{saved:'Teams saved to your account',saving:'Saving…',error:'Sync problem — open for details',off:'Signed in'}[s]||''):'Sign in to save your teams';if(!acctModal.hidden&&this.user)renderAcctBody();},
+  async onAuth(u){
+    this.user=u;renderAcctBtn();renderAcctSettings();
+    if(this.unsub){this.unsub();this.unsub=null;}
+    if(!u){this.setStatus('off');if(!acctModal.hidden)renderAcctBody();return;}
+    const ref=this.db.collection('users').doc(u.uid);
+    try{
+      const snap=await ref.get();const cloud=snap.exists?snap.data():null;
+      const remote=cloud&&cloud[MODE]&&Array.isArray(cloud[MODE].teams)?normalizeStore(cloud[MODE]):null;
+      if(remote&&remote.teams.length){
+        // Cloud is the source of truth; any local teams it doesn't know about are added rather than lost.
+        const ids=new Set(remote.teams.map(t=>t.id));const extra=STORE.teams.filter(t=>!ids.has(t.id));
+        this.applyRemote(cloud);
+        if(extra.length){STORE.teams.push(...extra);LS.set(teamsKey(),STORE);renderTabs();await this.push(true);toast(`Loaded ${remote.teams.length} from your account, added ${extra.length} from this device`);}
+        else toast(`Loaded ${remote.teams.length} team${remote.teams.length===1?'':'s'} from your account`);
+      }
+      else if(STORE.teams.length){await this.push(true);toast(`Saved your ${STORE.teams.length} team${STORE.teams.length===1?'':'s'} to your account`);}
+      else{this.lastToken=cloud?cloud.token:null;this.setStatus('saved');}
+    }catch(e){console.warn('Cloud load failed',e);this.setStatus('error',e.code==='permission-denied'?'Firestore rules are blocking reads — add the rules from README.md.':authMsg(e));}
+    this.unsub=ref.onSnapshot(s=>{if(!s.exists||s.metadata.hasPendingWrites)return;const d=s.data();if(d.token&&d.token===this.lastToken)return;if(!d[MODE])return;this.applyRemote(d);toast('Teams updated from another device');},e=>{this.setStatus('error',e.code==='permission-denied'?'Firestore rules are blocking reads — add the rules from README.md.':authMsg(e));});
+    if(!acctModal.hidden)renderAcctBody();
+  },
+  applyRemote(d){
+    const s=d[MODE];if(!s||!Array.isArray(s.teams))return;
+    if(d.known&&typeof d.known==='object'){const k=LS.get('gh.known',{});Object.assign(k,d.known);LS.set('gh.known',k);}
+    STORE=normalizeStore(s);LS.set(teamsKey(),STORE);setActive(STORE.active);restoreKnown();
+    for(const p of ALL){p.pts=calcPts(p);p.proj=calcProj(p);}
+    renderTabs();renderRoster();
+    this.lastToken=d.token||null;this.setStatus('saved');
+  },
+  push(immediate){
+    if(!this.user||!this.ready)return Promise.resolve();
+    clearTimeout(this.writeTimer);this.setStatus('saving');
+    const write=async()=>{
+      const token=uid();this.lastToken=token;
+      const known=LS.get('gh.known',{}),k={};for(const id of allRosterIds())if(known[id])k[id]=known[id];
+      try{await this.db.collection('users').doc(this.user.uid).set({[MODE]:JSON.parse(JSON.stringify(STORE)),known:k,token,email:this.user.email||null,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});this.setStatus('saved');}
+      catch(e){console.warn('Cloud save failed',e);this.setStatus('error',e.code==='permission-denied'?'Firestore rules are blocking writes — add the rules from README.md.':authMsg(e));}
+    };
+    if(immediate)return write();
+    this.writeTimer=setTimeout(write,800);return Promise.resolve();
+  },
+  async google(){const p=new firebase.auth.GoogleAuthProvider();try{await firebase.auth().signInWithPopup(p);}catch(e){if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment')return firebase.auth().signInWithRedirect(p);throw e;}},
+  signIn(email,pw){return firebase.auth().signInWithEmailAndPassword(email,pw);},
+  signUp(email,pw){return firebase.auth().createUserWithEmailAndPassword(email,pw);},
+  reset(email){return firebase.auth().sendPasswordResetEmail(email);},
+  async signOut(){if(this.unsub){this.unsub();this.unsub=null;}await firebase.auth().signOut();}
+};
+function initialOf(u){const n=(u.displayName||u.email||'?').trim();return n[0].toUpperCase();}
+function firstNameOf(u){return (u.displayName||u.email||'').split(/[\s@]/)[0];}
+function avatarHtml(u){return u.photoURL?`<span class="av"><img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer"></span>`:`<span class="av">${esc(initialOf(u))}</span>`;}
+function renderAcctBtn(){
+  const u=ACCOUNT.user;
+  acctBtn.innerHTML=(u?avatarHtml(u):'<span class="av off">?</span>')+`<span class="nm">${u?esc(firstNameOf(u)):'Sign in'}</span><i class="sync" id="syncDot"></i>`;
+  acctBtn.querySelector('.sync').className='sync '+(u?ACCOUNT.status:'');
+}
+function renderAcctBody(){
+  const u=ACCOUNT.user;
+  if(u){
+    const age=ACCOUNT.savedAt?Math.round((Date.now()-ACCOUNT.savedAt)/1000):null;
+    const line={saved:age==null?'Synced':age<5?'Saved just now':age<60?`Saved ${age}s ago`:`Saved ${Math.floor(age/60)}m ago`,saving:'Saving…',error:ACCOUNT.statusMsg||'Sync problem',off:'Connecting…'}[ACCOUNT.status];
+    acctBody.innerHTML=`<div class="me">${avatarHtml(u)}<div><b>${esc(u.displayName||firstNameOf(u))}</b><span>${esc(u.email||'')}</span></div></div>
+      <p class="note">Your teams, rosters and scoring rules save to this account automatically and follow you to any device. <b class="${ACCOUNT.status==='error'?'':'aok'}" style="${ACCOUNT.status==='error'?'color:var(--neg)':''}">${esc(line)}</b></p>
+      <div class="danger"><button class="chip" id="signOut">Sign out</button></div>
+      <p class="note">Signing out keeps a copy of your teams on this device.</p>`;
+    $('#signOut').addEventListener('click',async()=>{try{await ACCOUNT.signOut();toast('Signed out');}catch(e){toast(authMsg(e));}});
+    return;
+  }
+  const up=ACCOUNT.mode==='signup';
+  acctBody.innerHTML=`<p class="note">Sign in to keep your teams on your account and pick them up on any device.</p>
+    <button class="btn google wide" id="gBtn"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.3l7.9 6.1C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.6A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.8-4.6l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.2-13.5-10l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>Continue with Google</button>
+    <div class="or">or use email</div>
+    <form class="aform" id="emailForm" autocomplete="on">
+      <input id="aEmail" type="email" placeholder="Email" autocomplete="email" required>
+      <input id="aPw" type="password" placeholder="${up?'Choose a password (6+ characters)':'Password'}" autocomplete="${up?'new-password':'current-password'}" minlength="6" required>
+      <button class="btn wide" type="submit" id="emailSubmit">${up?'Create account':'Sign in'}</button>
+    </form>
+    <div class="alinks"><button type="button" id="toggleMode">${up?'I already have an account':'Create an account'}</button>${up?'':'<button type="button" id="forgotPw">Forgot password?</button>'}</div>
+    <p class="amsg" id="aMsg"></p>`;
+  const msg=(t,ok)=>{const m=$('#aMsg');m.textContent=t;m.classList.toggle('ok',!!ok);};
+  const busy=on=>{acctBody.querySelectorAll('button').forEach(b=>b.disabled=on);};
+  $('#gBtn').addEventListener('click',async()=>{busy(true);msg('');try{await ACCOUNT.google();acctModal.hidden=true;toast('Signed in');}catch(e){msg(authMsg(e));}finally{busy(false);}});
+  $('#emailForm').addEventListener('submit',async e=>{e.preventDefault();busy(true);msg('');const em=$('#aEmail').value.trim(),pw=$('#aPw').value;
+    try{if(up)await ACCOUNT.signUp(em,pw);else await ACCOUNT.signIn(em,pw);acctModal.hidden=true;toast(up?'Account created':'Signed in');}catch(e){msg(authMsg(e));}finally{busy(false);}});
+  $('#toggleMode').addEventListener('click',()=>{ACCOUNT.mode=up?'signin':'signup';renderAcctBody();setTimeout(()=>$('#aEmail').focus(),30);});
+  const f=$('#forgotPw');if(f)f.addEventListener('click',async()=>{const em=$('#aEmail').value.trim();if(!em){msg('Enter your email above first.');$('#aEmail').focus();return;}try{await ACCOUNT.reset(em);msg('Password reset email sent — check your inbox.',true);}catch(e){msg(authMsg(e));}});
+  setTimeout(()=>$('#aEmail').focus(),30);
+}
+function renderAcctSettings(){
+  const el=$('#acctSettings');
+  if(!ACCOUNT.configured()){el.innerHTML=`<p class="note">Accounts are <b>off</b> — this page is saving teams to this browser only. To enable sign-in and cloud sync, paste your Firebase web config into <code>FIREBASE_CONFIG</code> at the top of the script in <code>index.html</code>; setup steps are in the README.</p>`;return;}
+  const u=ACCOUNT.user;
+  el.innerHTML=u?`<p class="note">Signed in as <b>${esc(u.email||u.displayName||'')}</b>. Teams sync to your account automatically.</p>`:`<p class="note">Accounts are <b>on</b>. You’re not signed in, so teams are saved to this browser only.</p>`;
+}
+function openAcct(){ACCOUNT.mode='signin';renderAcctBody();acctModal.hidden=false;}
+acctBtn.addEventListener('click',openAcct);
+$('#closeAcct').addEventListener('click',()=>{acctModal.hidden=true;});
+acctModal.addEventListener('click',e=>{if(e.target===acctModal)acctModal.hidden=true;});
+setInterval(()=>{if(!acctModal.hidden&&ACCOUNT.user)renderAcctBody();},15000);
 
 /* ================= BROADCAST ================= */
 const screen=$('#screen'),vurl=$('#vurl'),onair=$('#onair'),bnote=$('#bnote');
@@ -1128,6 +1333,7 @@ function finishBoot(){
   $('#simGroup').hidden=MODE==='sleeper';
   $('#hint').innerHTML=(MODE==='sleeper'?'Live stats via Sleeper &nbsp;·&nbsp; ':'')+'Press <kbd>/</kbd> to search &nbsp;·&nbsp; <kbd>ESC</kbd> to close &nbsp;·&nbsp; double-click a tab to rename';
   renderSettings();renderTabs();renderRoster();renderSlate();renderWire(true);refreshStatuses();updateFeedTag();
+  ACCOUNT.init();   // non-blocking; the board is already usable
   const v=LS.get('gh.video','');if(v)vurl.value=v;
   setInterval(()=>{
     if(MODE==='sim')SIM.tick();
@@ -1151,7 +1357,7 @@ async function boot(){
   MODE='sim';loadTeams();SIM.init();finishBoot();
 }
 // Console handle for poking at the data layer, e.g. GH.sleeper.poll()
-window.GH={get mode(){return MODE},get players(){return PLAYERS},get games(){return GAMES},get teams(){return STORE},get team(){return team},get feed(){return FEED},sleeper:SLEEPER,sim:SIM};
+window.GH={get mode(){return MODE},get players(){return PLAYERS},get games(){return GAMES},get teams(){return STORE},get team(){return team},get feed(){return FEED},sleeper:SLEEPER,sim:SIM,account:ACCOUNT};
 boot();
 })();
 </script>
