@@ -173,6 +173,10 @@
   /* ---- Out-of-town slate ---- */
   .slate-h{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:8px}
   .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ash)}
+  .slate-r{display:flex;align-items:center;gap:10px}
+  .wsel{background:var(--turf-3);border:1px solid var(--line);color:var(--chalk-2);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:4px 24px 4px 8px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ash) 50%),linear-gradient(135deg,var(--ash) 50%,transparent 50%);background-position:calc(100% - 12px) 55%,calc(100% - 8px) 55%;background-size:4px 4px;background-repeat:no-repeat}
+  .wsel:hover{border-color:var(--chalk-2);color:var(--chalk)}
+  .wsel:focus{outline:0;border-color:var(--flag)}
   .slate{display:flex;flex-direction:column}
   .sg{flex:none;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:8px 4px;border-bottom:1px solid var(--line-soft);font-family:var(--mono);font-size:12px}
   .sg .teams{display:flex;align-items:center;gap:10px;min-width:0}
@@ -424,7 +428,7 @@
       </div>
       <div class="bnote" id="bnote">Some streaming sites refuse to load inside other pages — if the screen stays black, try that stream's official embed link.</div>
 
-      <div class="slate-h"><span class="eyebrow">Around the league</span><span class="eyebrow" id="slateCount"></span></div>
+      <div class="slate-h"><span class="eyebrow">Around the league</span><span class="slate-r"><span class="eyebrow" id="slateCount"></span><select id="weekSel" class="wsel" aria-label="Week to show" hidden></select></span></div>
       <div class="slate" id="slate"></div>
     </aside>
 
@@ -1061,8 +1065,30 @@ function addPlayer(id){
 function removePlayer(id){const el=rows.get(id);const done=()=>{const i=roster.indexOf(id);if(i>=0)roster.splice(i,1);saveTeams();renderRoster();};if(el){el.classList.add('out');setTimeout(done,280);}else done();}
 
 /* ================= RENDER: SLATE ================= */
-const slateEl=$('#slate');const slateRows=new Map();
-function slateOrder(){const rank={live:0,pre:1,final:2,canceled:3};return GAMES.slice().sort((a,b)=>rank[a.status]-rank[b.status]||a.kick-b.kick);}
+const slateEl=$('#slate');const slateRows=new Map();const weekSel=$('#weekSel');
+const SLATE_VIEW={week:null,games:[]};          // week null = the live week (GAMES); otherwise a fetched snapshot
+const WEEK_CACHE=new Map();
+const slateGames=()=>SLATE_VIEW.week?SLATE_VIEW.games:GAMES;
+function slateOrder(){const rank={live:0,pre:1,final:2,canceled:3};return slateGames().slice().sort((a,b)=>rank[a.status]-rank[b.status]||a.kick-b.kick);}
+function initWeekSelect(){
+  if(MODE!=='sleeper'){weekSel.hidden=true;return;}
+  const cur=+SLEEPER.week,max=SLEEPER.type==='regular'?18:4;
+  weekSel.innerHTML='';for(let w=1;w<=max;w++){const o=document.createElement('option');o.value=w;o.textContent='Week '+w+(w===cur?' · now':'');weekSel.appendChild(o);}
+  weekSel.value=String(cur);weekSel.hidden=false;
+}
+async function showWeek(w){
+  w=+w;
+  if(w===+SLEEPER.week){SLATE_VIEW.week=null;SLATE_VIEW.games=[];renderSlate();return;}
+  let games=WEEK_CACHE.get(w);
+  if(!games){
+    slateEl.innerHTML='<div class="pm-note" style="padding:18px">Loading week '+w+'…</div>';$('#slateCount').textContent='';
+    try{const arr=await SLEEPER.json(`/scores/nfl/${SLEEPER.type}/${SLEEPER.season}/${w}`);games=(Array.isArray(arr)?arr:[]).map(e=>SLEEPER.gameFrom(e)).filter(g=>g.home&&g.away).sort((a,b)=>a.kick-b.kick);WEEK_CACHE.set(w,games);}
+    catch(e){slateEl.innerHTML='<div class="pm-note" style="padding:18px">Couldn’t load week '+w+'.</div>';return;}
+  }
+  if(+weekSel.value!==w)return;             // user moved on while we were loading
+  SLATE_VIEW.week=w;SLATE_VIEW.games=games;renderSlate();
+}
+weekSel.addEventListener('change',()=>showWeek(weekSel.value));
 function renderSlate(){
   slateEl.innerHTML='';slateRows.clear();
   slateOrder().forEach(g=>{
@@ -1071,14 +1097,14 @@ function renderSlate(){
     el.innerHTML=`<div class="teams">
       <span class="t ${g.poss===g.away?'poss':''}" data-t="${esc(g.away)}" style="--tc:${teamColor(g.away)}"><i></i>${esc(g.away)}</span><span class="sc" data-sc="a">${pre?'':g.as}</span><span class="at">@</span>
       <span class="t ${g.poss===g.home?'poss':''}" data-t="${esc(g.home)}" style="--tc:${teamColor(g.home)}"><i></i>${esc(g.home)}</span><span class="sc" data-sc="h">${pre?'':g.hs}</span></div>
-      <span class="rt"><span class="dd" data-dd="${esc(g.id)}">${driveHtml(g)}</span><span class="gs ${st.c}" data-gs="${esc(g.home)}">${st.t}</span></span>`;
+      <span class="rt"><span class="dd" data-dd="${esc(g.id)}">${driveHtml(g)}</span><span class="gs ${st.c}" data-sgs="${esc(g.id)}">${st.t}</span></span>`;
     slateRows.set(g.id,el);slateEl.appendChild(el);
   });
-  const live=GAMES.filter(g=>g.status==='live').length;$('#slateCount').textContent=live?live+' live':'';
+  const live=slateGames().filter(g=>g.status==='live').length;$('#slateCount').textContent=live?live+' live':'';
 }
 slateEl.addEventListener('scroll',()=>{slateEl.classList.toggle('at-end',slateEl.scrollTop+slateEl.clientHeight>=slateEl.scrollHeight-2);},{passive:true});
 function refreshSlateScores(){
-  for(const g of GAMES){const el=slateRows.get(g.id);if(!el)continue;
+  for(const g of slateGames()){const el=slateRows.get(g.id);if(!el)continue;
     const a=el.querySelector('[data-sc=a]'),h=el.querySelector('[data-sc=h]');
     const av=g.status==='pre'?'':String(g.as),hv=g.status==='pre'?'':String(g.hs);
     if(a.textContent!==av){a.textContent=av;a.classList.add('bump');setTimeout(()=>a.classList.remove('bump'),1200);}
@@ -1101,7 +1127,7 @@ function refreshStatuses(){
   const cache={};
   document.querySelectorAll('[data-gs]').forEach(el=>{const t=el.dataset.gs;const st=cache[t]||(cache[t]=gameStatus(gameOf(t)));if(el.textContent!==st.t)el.textContent=st.t;if(!el.classList.contains(st.c)){el.className='gs '+st.c;}});
   document.querySelectorAll('[data-scr]').forEach(el=>{const v=scoreText(el.dataset.scr);if(el.textContent!==v)el.textContent=v;});
-  for(const g of GAMES){const el=slateRows.get(g.id);if(!el)continue;const d=el.querySelector('.dd');const h=driveHtml(g);if(d&&d.innerHTML!==h)d.innerHTML=h;}
+  for(const g of slateGames()){const el=slateRows.get(g.id);if(!el)continue;const st=gameStatus(g);const gs=el.querySelector('[data-sgs]');if(gs){if(gs.textContent!==st.t)gs.textContent=st.t;if(!gs.classList.contains(st.c))gs.className='gs '+st.c;}const d=el.querySelector('.dd');const h=driveHtml(g);if(d&&d.innerHTML!==h)d.innerHTML=h;}
 }
 
 /* ================= RENDER: WIRE + HEADER ================= */
@@ -1466,7 +1492,7 @@ function finishBoot(){
   $('#weekTag').textContent=MODE==='sleeper'?`${SLEEPER.type==='regular'?'Week':SLEEPER.type} ${SLEEPER.week}`:'Sim week';
   $('#simGroup').hidden=MODE==='sleeper';
   $('#hint').innerHTML=(MODE==='sleeper'?'Live stats via Sleeper &nbsp;·&nbsp; ':'')+'Press <kbd>/</kbd> to search &nbsp;·&nbsp; <kbd>ESC</kbd> to close &nbsp;·&nbsp; double-click a tab to rename';
-  renderSettings();renderTabs();renderRoster();renderSlate();renderWire(true);refreshStatuses();updateFeedTag();
+  renderSettings();renderTabs();renderRoster();initWeekSelect();renderSlate();renderWire(true);refreshStatuses();updateFeedTag();
   ACCOUNT.init();   // non-blocking; the board is already usable
   const v=LS.get('gh.video','');if(v)vurl.value=v;
   setInterval(()=>{
