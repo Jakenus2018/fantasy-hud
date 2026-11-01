@@ -250,12 +250,11 @@
   .vs-t{text-align:right}
   .vs-t .num{font-family:var(--display);font-weight:800;font-style:italic;font-size:40px;line-height:.95;font-variant-numeric:tabular-nums}
   .vs-t .k{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ash-2);margin-top:3px}
-  .vs-empty{margin:0;padding:22px 16px;border:1px dashed var(--line);text-align:center;color:var(--ash);font-size:14px}
+  .vs-empty{margin:0 0 8px;padding:22px 16px;border:1px dashed var(--line);text-align:center;color:var(--ash);font-size:14px}
+  .vs-add{width:100%;margin-top:8px;padding:9px 12px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--display);font-weight:700;font-style:italic;font-size:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--ash);transition:color .2s,border-color .2s}
+  .vs-add:hover{color:var(--flag);border-color:var(--flag)}
+  .vs-add svg{width:14px;height:14px}
   .sto{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--flag);white-space:nowrap;max-width:16ch;overflow:hidden;text-overflow:ellipsis}
-  @media (min-width:1200px){
-    .app.focus .match{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
-    .app.focus .side.mine .vs-h{display:flex}
-  }
 
   .lineup-h{display:grid;grid-template-columns:44px 1fr minmax(180px,44%) 30px;gap:12px;padding:0 10px 5px;border-bottom:1px solid var(--line)}
   .lineup-h span{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--ash-2);text-transform:uppercase}
@@ -295,6 +294,7 @@
   .pts.hot{color:var(--good);animation:ptsPunch .55s cubic-bezier(.2,.9,.2,1)}
   .pts.cold{color:var(--flag);animation:ptsPunch .55s cubic-bezier(.2,.9,.2,1)}
   @keyframes ptsPunch{0%{transform:scale(1)}30%{transform:scale(1.18) translateY(-2px)}100%{transform:scale(1)}}
+  .pts.yet{color:var(--ash-2)}
   .proj{order:-1;font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--ash-2)}
   .delta{position:absolute;right:calc(100% + 12px);top:4px;font-family:var(--display);font-weight:800;font-style:italic;font-size:18px;line-height:1;color:var(--good);pointer-events:none;white-space:nowrap;animation:deltaFloat 1.5s cubic-bezier(.2,.8,.2,1) forwards;text-shadow:0 0 14px rgba(94,224,161,.6)}
   .delta.neg{color:var(--flag);text-shadow:0 0 14px rgba(255,122,42,.6)}
@@ -422,6 +422,24 @@
     .res{grid-template-columns:40px 1fr auto;}
     .res .rp{display:none}
   }
+  /* Matchup side by side whenever the HUD has room; each lineup compacts its rows to fit its column. */
+  .hud{container:hud/inline-size}
+  .side{container:side/inline-size}
+  @container hud (min-width:620px){
+    .match.duo{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+    .match.duo .side.mine .vs-h{display:flex}
+  }
+  @container side (max-width:520px){
+    .lineup-h{display:none}
+    .row{grid-template-columns:34px 1fr minmax(104px,44%) 20px;gap:3px 8px;padding:7px 4px}
+    .row .wtop{display:block}
+    .row .name{max-width:none;font-size:17px}
+    .row .meta{margin-top:2px}
+    .row .line{white-space:normal;line-height:1.3;font-size:10.5px}
+    .who .sub{white-space:normal;flex-wrap:wrap;gap:2px 8px}
+    .pos{font-size:14px;gap:5px}
+    .pts{font-size:20px}
+  }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
   }
@@ -508,11 +526,11 @@
         <div class="vs-h">
           <div class="vs-n"><span class="eyebrow">Opponent</span><input id="oppName" maxlength="28" placeholder="Name their team" aria-label="Opponent team name" autocomplete="off" spellcheck="false"></div>
           <div class="vs-t"><div class="num" id="oppTotal">0.00</div><div class="k" id="oppProj"></div></div>
-          <button class="btn ghost" id="addOpp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add player</button>
         </div>
         <div class="lineup-h" id="oppHead" hidden><span>Pos</span><span>Player</span><span>Points · stats</span><span></span></div>
         <div id="oppRoster"></div>
         <p class="vs-empty" id="vsEmpty">Add the players you’re up against to track the matchup live.</p>
+        <button class="vs-add" id="addOpp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add opponent player</button>
       </div>
       </div>
       <div class="hint" id="hint">Press <kbd>/</kbd> to search &nbsp;·&nbsp; <kbd>ESC</kbd> to close &nbsp;·&nbsp; double-click a tab to rename</div>
@@ -1003,6 +1021,9 @@ function sortedRoster(){return sortedIds(roster);}
 function nameHtml(p){if(p.pos==='DST')return `<b>${esc(p.name)}</b>`;const parts=p.name.split(' ');let li=parts.length-1;if(/^(Jr\.|Sr\.|II|III|IV)$/.test(parts[li])&&parts.length>2)li--;return esc(parts.slice(0,li).join(' '))+' <b>'+esc(parts.slice(li).join(' '))+'</b>';}
 function oppHtml(p){const o=oppOf(p);return `<span class="opp">${o?(o.home?'vs':'@')+' '+o.abbr:'BYE'}</span><span class="scr" data-scr="${esc(p.team)}">${scoreText(p.team)}</span>`;}
 function scoreText(team){const g=gameOf(team);if(!g||g.status==='pre'||g.status==='canceled')return '';return g.home===team?`${g.hs}–${g.as}`:`${g.as}–${g.hs}`;}
+// No points to show until the player's game kicks off (or on a bye / cancellation).
+const notPlayed=p=>{const g=gameOf(p.team);return (!g||g.status==='pre'||g.status==='canceled')&&!p.pts;};
+const ptsText=p=>notPlayed(p)?'—':fmt(p.pts);
 function injHtml(p){return p.inj?`<span class="inj ${/OUT|IR|PUP|SUS/.test(p.inj)?'out':''}">${p.inj}</span>`:'';}
 function buildRow(p,side){
   const el=document.createElement('div');el.className='row';el.dataset.id=p.id;el.style.setProperty('--pc',POS_COLOR[p.pos]);
@@ -1011,7 +1032,7 @@ function buildRow(p,side){
     <div class="who"><div class="wtop"><div class="name">${nameHtml(p)}</div>
       <div class="meta"><span class="tm" style="--tc:${teamColor(p.team)}"><i></i>${esc(p.team)}</span>${oppHtml(p)}${injHtml(p)}</div></div>
       <div class="sub"><span class="gs ${st.c}" data-gs="${esc(p.team)}">${st.t}</span><span class="dd"></span></div></div>
-    <div class="score"><div class="sv"><span class="pts">${fmt(p.pts)}</span><span class="proj">PROJ ${p.proj.toFixed(1)}</span></div><div class="line ${sl.q?'quiet':''}">${esc(sl.t)}</div></div>
+    <div class="score"><div class="sv"><span class="pts ${notPlayed(p)?'yet':''}">${ptsText(p)}</span><span class="proj">PROJ ${p.proj.toFixed(1)}</span></div><div class="line ${sl.q?'quiet':''}">${esc(sl.t)}</div></div>
     <button class="rm" aria-label="Remove ${esc(p.name)}" title="Remove">×</button><span class="sweep"></span>`;
   el.querySelector('.rm').addEventListener('click',()=>removePlayer(p.id,side));
   el.querySelector('.who').addEventListener('click',()=>openPlayer(p));
@@ -1031,7 +1052,7 @@ function renderRoster(){
 }
 function renderOpp(){
   oppRosterEl.innerHTML='';oppRows.clear();
-  $('#vsSec').hidden=!team;if(!team)return;
+  $('#vsSec').hidden=!team;$('.match').classList.toggle('duo',!!team);if(!team)return;
   sortedIds(oppRoster).forEach((p,i)=>{const el=buildRow(p,'opp');el.style.animationDelay=(i*35)+'ms';oppRows.set(p.id,el);oppRosterEl.appendChild(el);});
   if(document.activeElement!==oppNameEl)oppNameEl.value=opp.name;
   $('#oppHead').hidden=oppRows.size===0;$('#vsEmpty').hidden=oppRows.size>0;
@@ -1044,7 +1065,8 @@ function renderMatchLine(){
 }
 function refreshRowStatic(p){
   const sl=statLine(p);
-  for(const m of [rows,oppRows]){const el=m.get(p.id);if(!el)continue;const line=el.querySelector('.line');line.textContent=sl.t;line.classList.toggle('quiet',sl.q);}
+  for(const m of [rows,oppRows]){const el=m.get(p.id);if(!el)continue;const line=el.querySelector('.line');line.textContent=sl.t;line.classList.toggle('quiet',sl.q);
+    const pe=el.querySelector('.pts'),yet=notPlayed(p);if(yet||pe.classList.contains('yet')){pe.textContent=ptsText(p);pe.classList.toggle('yet',yet);}}   // kickoff swaps the dash for 0.00
 }
 function refreshAllRows(){for(const id of new Set([...roster,...oppRoster])){const p=PLAYERS[id];if(p)refreshRowStatic(p);}refreshLiveCount();}
 function refreshLiveCount(){if(team)$('#tLive').textContent=sortedRoster().filter(p=>{const g=gameOf(p.team);return g&&g.status==='live';}).length;}
@@ -1114,7 +1136,7 @@ function tweenNumber(el,from,to){
 function animateScore(p,oldPts,newPts,isTD){for(const m of [rows,oppRows]){const el=m.get(p.id);if(el)animateRow(el,p,oldPts,newPts,isTD);}}
 function animateRow(el,p,oldPts,newPts,isTD){
   const d=R2(newPts-oldPts);const pts=el.querySelector('.pts'),scoreEl=el.querySelector('.score');
-  tweenNumber(pts,oldPts,newPts);
+  pts.classList.remove('yet');tweenNumber(pts,oldPts,newPts);
   el.classList.remove('pop','dip');void el.offsetWidth;el.classList.add(d>=0?'pop':'dip');
   pts.classList.remove('hot','cold');void pts.offsetWidth;pts.classList.add(d>=0?'hot':'cold');
   setTimeout(()=>pts.classList.remove('hot','cold'),900);
@@ -1332,7 +1354,7 @@ $('#closeTeam').addEventListener('click',closeTeamModal);
 teamModal.addEventListener('click',e=>{if(e.target===teamModal)closeTeamModal();});
 function rescoreAll(){
   for(const p of ALL){p.pts=calcPts(p);p.proj=calcProj(p);}
-  for(const [id,el] of [...rows,...oppRows]){const p=PLAYERS[id];if(p){el.querySelector('.pts').textContent=fmt(p.pts);el.querySelector('.proj').textContent='PROJ '+p.proj.toFixed(1);}}
+  for(const [id,el] of [...rows,...oppRows]){const p=PLAYERS[id];if(p){const pe=el.querySelector('.pts');pe.textContent=ptsText(p);pe.classList.toggle('yet',notPlayed(p));el.querySelector('.proj').textContent='PROJ '+p.proj.toFixed(1);}}
   refreshTotals(false);refreshTabTotals();
 }
 
