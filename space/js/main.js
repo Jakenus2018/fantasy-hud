@@ -39,7 +39,8 @@ const tzOf = () => S.launch?.location.tz || S.site?.tz || 'UTC';
 const fmtTime = (ts, tz, opts = {}) => new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz, timeZoneName: 'short', ...opts }).format(ts);
 const fmtDate = (ts, tz, opts = {}) => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: tz, ...opts }).format(ts);
 const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const coarse = L => /day|week|month|quarter|half|year|^m$|^q|^y|^hy|^d$|^w$/i.test(L?.precision || '');
+// Launch Library precision names: Second, Minute, Hour, Day, Week, Month, Quarter (Q1)…, Half (H1)…, Year, Fiscal year…
+const coarse = L => /day|week|month|quarter|half|year|^(d|w|mon|q[1-4]?|h[12]|y|fy)$/i.test(L?.precision || '');
 function dur(ms) {
   const s = Math.abs(ms) / 1000, d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
   return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${m}m ${Math.floor(s % 60)}s`;
@@ -197,8 +198,9 @@ function showLaunch(L, { fly = true } = {}) {
     $('#turntable').hidden = true;
     if (fly) scene.idleView();
   }
-  renderHero(); renderPanel(); renderUpcoming();
-  maybeLive();
+  for (const fn of [renderHero, renderPanel, renderUpcoming, maybeLive]) {
+    try { fn(); } catch (e) { console.error(fn.name, e); }
+  }
 }
 
 async function feature(L) {
@@ -262,7 +264,7 @@ function tickCount() {
   if (countMode === 'coarse') {
     const dt = new Date(L.net);
     set('d', p2(d)); set('h', p2(h)); set('m', '--'); set('s', '--');
-    $('#count .unit:nth-of-type(1) .l').textContent = 'Days ~';
+    const lbl = $('#count .unit .l'); if (lbl) lbl.textContent = 'Days ~';
     tm.title = `No earlier than ${fmtDate(dt, tzOf(), { year: 'numeric' })}`;
   } else { set('d', p2(d)); set('h', p2(h)); set('m', p2(m)); set('s', p2(s)); }
 }
@@ -632,7 +634,7 @@ function clock() {
   $('#ldClock').textContent = `${utc} UTC`;
 }
 function tick() {
-  clock(); tickCount(); tickLists();
+  try { clock(); tickCount(); tickLists(); } catch (e) { console.error(e); }
   if (S.launch && !S.flying) {
     const d = S.launch.net - Date.now();
     if (d < 0 && d > -1500) liveArmed = true;
@@ -715,4 +717,5 @@ const pickDetail = L => ({ booster: L.booster, config: L.config, video: L.video,
 })().catch(err => {
   console.error(err);
   $('#ldStatus').textContent = 'Something went wrong — ' + (err.message || err);
+  if (S.site) setTimeout(() => loader.done(), 1800); // the scene is usable even if one panel failed
 });

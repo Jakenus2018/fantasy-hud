@@ -68,7 +68,7 @@ export function normalize(l) {
     net: Date.parse(l.net),
     windowStart: l.window_start ? Date.parse(l.window_start) : null,
     windowEnd: l.window_end ? Date.parse(l.window_end) : null,
-    precision: l.net_precision?.abbrev || l.net_precision?.name || '',
+    precision: l.net_precision?.name || l.net_precision?.abbrev || '',
     status: { abbrev: l.status?.abbrev || 'TBD', name: l.status?.name || '', id: l.status?.id, desc: l.status?.description || '' },
     probability: num(l.probability),
     weatherConcerns: l.weather_concerns || '',
