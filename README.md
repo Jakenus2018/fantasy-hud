@@ -59,3 +59,17 @@ Each user can read and write only their own `users/{uid}` document, which holds 
 - Signing in on a device with local teams: the cloud copy is loaded, and any local teams the cloud doesn't have are added to it (nothing is thrown away). If the cloud is empty, the local teams are uploaded.
 - Edits made on another device appear live.
 - Signing out leaves a copy of the teams on the device.
+
+---
+
+# Jeff Launch — `/space`
+
+A second, separate page at [`space/`](space/index.html): a 3D aerial view of every active US launch site, the next rocket on the pad and its countdown, launch-day conditions, and a modelled replay of the flight.
+
+- **Sites & launches** — [Launch Library 2](https://thespacedevs.com/llapi) (The Space Devs, key-less). US launch locations come from the API; the page opens on the active site nearest the visitor (coarse IP location, falling back to the browser's time zone). Responses are cached in `localStorage` to respect LL2's ~15 requests/hour anonymous limit, with the LL2 dev mirror as a fallback.
+- **3D terrain** — Esri World Imagery draped over AWS Terrain Tiles elevation, blended across three resolutions around the pad; `MONO` switches to a contour/grid style (also the automatic fallback if imagery is blocked).
+- **Vehicles** — procedural models for Falcon 9/Heavy (with Dragon), Starship, New Glenn, Vulcan, Atlas V (with Starliner), Electron, Neutron, New Shepard, plus a generic model sized from LL2's vehicle data.
+- **Launch replay** — per-vehicle ascent profiles built from typical webcast timelines (Max-Q, MECO, staging, fairing sep, SECO), launch azimuth from the target orbit and site, booster recovery (drone ship, return-to-launch-site, tower catch) from LL2 landing data, broadcast-style auto camera with a booster-cam inset. If a launch is in progress when the page is open, the model plays in real time from T-0. Telemetry is modelled, not live.
+- **Conditions** — [Open-Meteo](https://open-meteo.com) weather now and at T-0, scored against common launch-commit thresholds (ground and upper-level winds, precipitation, lightning potential, cloud, visibility); sun/moon, twilight-plume outlook and whether the launch is visible from the visitor; live ISS position.
+
+Static files only, no build step; three.js loads from jsDelivr.
